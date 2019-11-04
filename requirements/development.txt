@@ -1,0 +1,3 @@
+-i https://pypi.python.org/simple
+-r base.txt
+django-debug-toolbar

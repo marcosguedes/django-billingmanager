@@ -1,0 +1,3 @@
+-i https://pypi.python.org/simple
+-r base.txt
+argon2-cffi==19.2.0

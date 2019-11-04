@@ -1,0 +1,8 @@
+logs/
+/manager/.project
+/manager/.pydevproject
+*.sqlite3
+.env
+/static/
+/manager/static/
+media/
