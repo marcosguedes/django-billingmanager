@@ -10,6 +10,7 @@ django = {extras = ["argon2"],version = "*"}
 django-environ = "*"
 django-debug-toolbar = "*"
 django-filer = "*"
+django-extensions = "*"
 
 [requires]
 python_version = "3.7"
