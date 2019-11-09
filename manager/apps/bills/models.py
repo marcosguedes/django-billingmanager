@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models.deletion import SET_NULL
 from django.template.defaultfilters import date
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _, gettext_noop, gettext
 from django_extensions.db.models import TimeStampedModel
 
@@ -24,11 +25,14 @@ class BillSource(models.Model):
     def __str__(self):
         return self.name
 
+    def get_related_bills(self):
+        return self.bills_bill_related.all()
+
 
 class AbstractBill(models.Model):
     source = models.ForeignKey(
         BillSource,
-        verbose_name=_("Name"),
+        verbose_name=_("Bill Source"),
         null=True,
         on_delete=SET_NULL,
         related_name="%(app_label)s_%(class)s_related",
@@ -92,6 +96,9 @@ class RecurrentBill(AbstractBill):
         max_length=100,
         choices=PERIODICITY_CHOICES,
         default=PERIODICITY_MONTHLY,
+        help_text=_(
+            "Ignore the day. Bills are generated in the first of every a month / year"
+        ),
     )
     active = models.BooleanField(verbose_name=_("Active"), default=False)
 
@@ -99,6 +106,35 @@ class RecurrentBill(AbstractBill):
         verbose_name = _("Recurrent Bill")
         verbose_name_plural = _("Recurrent Bills")
         ordering = ("active", "date_start")
+
+    def get_related_bills(self):
+        return self.source.get_related_bills()
+
+    def can_generate_bill(self, date=None):
+        """
+        Retrieve any bill issued in the current year or month if the Recurrent
+        Bill isn't set in the future. If no bill was found, then we can generate
+        a bill
+        """
+        if not date:
+            date = timezone.now()
+        if self.date_start > date:
+            return False
+
+        bills_generated_on_date_year = self.get_related_bills().filter(
+            date__year=date.year
+        )
+        bills_generated_on_date_month = bills_generated_on_date_year.filter(
+            date__month=date.month
+        )
+        return (
+            not bills_generated_on_date_month.exists()
+            if self.periodicity == self.PERIODICITY_MONTHLY
+            else not bills_generated_on_date_year.exists()
+        )
+
+    def generate_bills(self):
+        pass
 
 
 class Bill(AbstractBill, TimeStampedModel):

@@ -8,9 +8,10 @@ verify_ssl = true
 [packages]
 django = {extras = ["argon2"],version = "*"}
 django-environ = "*"
-django-debug-toolbar = "*"
+django-debug-toolbar = ">1"
 django-filer = "*"
 django-extensions = "*"
+python-dateutil = "*"
 
 [requires]
 python_version = "3.7"
