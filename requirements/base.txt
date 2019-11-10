@@ -12,3 +12,4 @@ sqlparse==0.3.0
 Unidecode==1.0.23
 django_extensions
 python-dateutil
+django-admin-rangefilter

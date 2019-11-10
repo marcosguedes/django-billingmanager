@@ -12,6 +12,7 @@ django-debug-toolbar = ">1"
 django-filer = "*"
 django-extensions = "*"
 python-dateutil = "*"
+django-admin-rangefilter = "*"
 
 [requires]
 python_version = "3.7"

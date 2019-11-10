@@ -1,3 +1,5 @@
+from dateutil import rrule
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.deletion import SET_NULL
 from django.template.defaultfilters import date
@@ -105,19 +107,20 @@ class RecurrentBill(AbstractBill):
     class Meta:
         verbose_name = _("Recurrent Bill")
         verbose_name_plural = _("Recurrent Bills")
-        ordering = ("active", "date_start")
+        ordering = ("active", "source", "name")
 
     def get_related_bills(self):
         return self.source.get_related_bills()
 
     def can_generate_bill(self, date=None):
         """
-        Retrieve any bill issued in the current year or month if the Recurrent
+        Retrieve any bill issued in the selected date if the Recurrent
         Bill isn't set in the future. If no bill was found, then we can generate
-        a bill
+        a bill.
+        :param date: use a custom date. Defaults to today
         """
         if not date:
-            date = timezone.now()
+            date = timezone.now().date()
         if self.date_start > date:
             return False
 
@@ -127,27 +130,79 @@ class RecurrentBill(AbstractBill):
         bills_generated_on_date_month = bills_generated_on_date_year.filter(
             date__month=date.month
         )
+
+        # README: We only assume there are only two periodicity cases
         return (
             not bills_generated_on_date_month.exists()
             if self.periodicity == self.PERIODICITY_MONTHLY
             else not bills_generated_on_date_year.exists()
         )
 
-    def generate_bills(self):
-        pass
+    def generate_bills(self, date_limit=None):
+        """
+        Will generate bills from start_date up to now.
+        :param date_limit: Date up to where we'll create bills. Defaults to today
+        :attention: creating a bill and resaving it after assigning
+        tenants will trigger save() two times, which means it'll try
+        to create TenantValueBill two times.
+        It won't be an issue since there are no tenants in the first
+        save(), but pay attention. Make sure only one bill from the
+        same source is created per month.
+        """
+        if not self.can_generate_bill():
+            raise ValidationError(
+                "Creating bills for {}: Bill already issue for this {}".format(
+                    self,
+                    "month" if self.periodicity == self.PERIODICITY_MONTHLY else "year",
+                )
+            )
+
+        if not date_limit:
+            date_limit = timezone.now().date()
+
+        if self.date_start.day > 27:
+            raise ValidationError(
+                "Creating bills for {}: Please try to use a start date between day 1 and 26 to avoid leap year shenanigans".format(
+                    self
+                )
+            )
+
+        # README: We assume there are only two periodicity cases
+        dates = [
+            dt
+            for dt in rrule.rrule(
+                rrule.MONTHLY
+                if self.periodicity == RecurrentBill.PERIODICITY_MONTHLY
+                else rrule.YEARLY,
+                dtstart=self.date_start,
+                until=date_limit,
+            )
+        ]
+        bills_list = []
+
+        for date in dates:
+            bill, _ = Bill.objects.get_or_create(
+                source=self.source, name=self.name, value=self.value, date=date
+            )
+            bill.tenants.set([tenant for tenant in self.tenants.all()])
+            bill.save()  # trigger save logic
+            bills_list.append(bill)
+
+        return bills_list
 
 
 class Bill(AbstractBill, TimeStampedModel):
     """
-    :summary: The bill itself. Will create several TenantValueBill on save
-    depending on the number of tenants with its value split between them
+    :summary: The bill itself. Will create several TenantValueBill on save,
+    dividing the value between the number of tenants
     """
 
-    date = models.DateField(verbose_name=_("Date"))  # use SelectDateWidget
+    date = models.DateField(verbose_name=_("Date"), default=timezone.now)
 
     class Meta:
         verbose_name = _("Bill")
         verbose_name_plural = _("Bills")
+        ordering = ("-date", "source", "name")
 
 
 class TenantValueBill(TimeStampedModel):
@@ -161,16 +216,14 @@ class TenantValueBill(TimeStampedModel):
             "Value will be divided by the number of selected Tenants upon save"
         ),
     )
-    paid = models.BooleanField(verbose_name=_("Paid"), default=False)
 
     class Meta:
         verbose_name = _("Tenant Bill")
         verbose_name_plural = _("Tenant Bills")
 
     def __str__(self):
-        return "%(name)s: %(bill)s (%(status)s)" % {
-            "bill": self.bill,
-            "name": self.name,
+        return "%(name)s: %(bill)s (%(date)s)" % {
+            "name": str(self.tenant),
+            "bill": str(self.bill),
             "date": date(self.bill.date, "F Y"),
-            "status": gettext("Paid") if self.paid else gettext("Unpaid"),
         }
