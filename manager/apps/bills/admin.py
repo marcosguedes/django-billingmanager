@@ -1,12 +1,11 @@
 from django.contrib import admin, messages
 from django.core.exceptions import ValidationError
-from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _, ngettext
 from rangefilter.filter import DateRangeFilter
 
 from .forms import BillForm
-from .models import Bill, BillSource, RecurrentBill
+from .models import Bill, BillSource, RecurrentBill, TenantValueBill
 
 
 # Register your models here.
@@ -19,7 +18,6 @@ class RecurrentBillAdmin(admin.ModelAdmin):
     save_as = True
 
     def generate_bills(self, request, queryset):
-        today = timezone.now().date()
         total_bills = []
         error_msgs = []
 
@@ -72,11 +70,43 @@ class RecurrentBillAdmin(admin.ModelAdmin):
 class BillAdmin(admin.ModelAdmin):
     date_hierarchy = "date"
     list_display = ["__str__", "value", "date"]
-    list_editable = ["date"]
+    list_editable = ["date", "value"]
     filter_horizontal = ["tenants"]
     list_filter = ["tenants", ("date", DateRangeFilter), "source"]
+    actions = ["regenerate_tenant_bill"]
     form = BillForm
     save_as = True
 
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+        form.instance.split_value_between_tenants()
+
+    def regenerate_tenant_bill(self, request, queryset):
+
+        for obj in queryset:
+            TenantValueBill.objects.filter(bill=obj).delete()
+            obj.split_value_between_tenants()
+
+        self.message_user(
+            request,
+            _("Tenant Bills successfully (re)generated"),
+            level=messages.SUCCESS,
+        )
+
+    regenerate_tenant_bill.short_description = _("(Re)Generate Tenant bills")
+
 
 admin.site.register(BillSource, admin.ModelAdmin)
+
+
+@admin.register(TenantValueBill)
+class TenantValueBillAdmin(admin.ModelAdmin):
+    date_hierarchy = "bill__date"
+    list_display = ["__str__", "value", "bill_date"]
+    list_filter = ["tenant", ("bill__date", DateRangeFilter), "bill__date"]
+
+    def bill_date(self, obj):
+        return obj.bill.date.strftime("%d/%m/%Y")
+
+    bill_date.short_description = _("Date")
+    bill_date.admin_order_field = "bill__date"

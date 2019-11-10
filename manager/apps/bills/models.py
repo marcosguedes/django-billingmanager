@@ -2,6 +2,7 @@ from dateutil import rrule
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.deletion import SET_NULL
+from django.db.utils import IntegrityError
 from django.template.defaultfilters import date
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _, gettext_noop, gettext
@@ -77,7 +78,7 @@ class RecurrentBill(AbstractBill):
     according to a date and period. If its Start Date
     is set to 8 of November with a monthly period,
     each bill will be created at the 8th day of
-    every month
+    every month (or later depending on the day the project is run)
     """
 
     PERIODICITY_MONTHLY = "monthly"
@@ -139,16 +140,6 @@ class RecurrentBill(AbstractBill):
         )
 
     def generate_bills(self, date_limit=None):
-        """
-        Will generate bills from start_date up to now.
-        :param date_limit: Date up to where we'll create bills. Defaults to today
-        :attention: creating a bill and resaving it after assigning
-        tenants will trigger save() two times, which means it'll try
-        to create TenantValueBill two times.
-        It won't be an issue since there are no tenants in the first
-        save(), but pay attention. Make sure only one bill from the
-        same source is created per month.
-        """
         if not self.can_generate_bill():
             raise ValidationError(
                 "Creating bills for {}: Bill already issue for this {}".format(
@@ -185,16 +176,16 @@ class RecurrentBill(AbstractBill):
                 source=self.source, name=self.name, value=self.value, date=date
             )
             bill.tenants.set([tenant for tenant in self.tenants.all()])
-            bill.save()  # trigger save logic
             bills_list.append(bill)
+            bill.split_value_between_tenants()
 
         return bills_list
 
 
 class Bill(AbstractBill, TimeStampedModel):
     """
-    :summary: The bill itself. Will create several TenantValueBill on save,
-    dividing the value between the number of tenants
+    :summary: The bill itself. Will create several TenantValueBill
+    if saved via admin, dividing the value between the number of tenants
     """
 
     date = models.DateField(verbose_name=_("Date"), default=timezone.now)
@@ -203,6 +194,32 @@ class Bill(AbstractBill, TimeStampedModel):
         verbose_name = _("Bill")
         verbose_name_plural = _("Bills")
         ordering = ("-date", "source", "name")
+
+    # def save(self, *args, **kwargs):
+    #     # We can't split the value on save due to M2M relationships
+    #     # being updated after the main save
+    #     self.split_value_between_tenants()
+    #     super().save(*args, **kwargs)
+
+    def split_value_between_tenants(self, delete_old=True):
+        if not self.tenants.all().exists():
+            return
+        tenantbill_list = []
+        for tenant in self.tenants.all():
+            if delete_old:
+                TenantValueBill.objects.filter(tenant=tenant, bill=self).delete()
+
+            try:
+                tenantbill = TenantValueBill.objects.create(
+                    tenant=tenant,
+                    bill=self,
+                    value=self.value / self.tenants.all().count(),
+                )
+                tenantbill_list.append(tenantbill)
+            except IntegrityError:
+                # Throws error with the same tenant and bill. This is expected
+                pass
+        return tenantbill_list
 
 
 class TenantValueBill(TimeStampedModel):
@@ -220,6 +237,7 @@ class TenantValueBill(TimeStampedModel):
     class Meta:
         verbose_name = _("Tenant Bill")
         verbose_name_plural = _("Tenant Bills")
+        unique_together = ("tenant", "bill")
 
     def __str__(self):
         return "%(name)s: %(bill)s (%(date)s)" % {
