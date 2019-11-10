@@ -8,7 +8,6 @@ from .forms import BillForm
 from .models import Bill, BillSource, RecurrentBill, TenantValueBill
 
 
-# Register your models here.
 @admin.register(RecurrentBill)
 class RecurrentBillAdmin(admin.ModelAdmin):
     list_display = ["__str__", "value", "periodicity", "date_start", "active"]

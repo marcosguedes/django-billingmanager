@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "rangefilter",
     "tenants",
+    "bank_account",
     "bills",
 ]
 

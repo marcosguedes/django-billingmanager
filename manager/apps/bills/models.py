@@ -47,15 +47,7 @@ class AbstractBill(models.Model):
         blank=True,
         help_text=_("Optional. Source can be used instead of name"),
     )
-    value = models.DecimalField(
-        verbose_name=_("Value"),
-        max_digits=9,
-        decimal_places=2,
-        # TODO: Place this help_text in Bill's ModelForm only
-        help_text=_(
-            "Value will be divided by the number of selected Tenants upon save"
-        ),
-    )
+    value = models.DecimalField(verbose_name=_("Value"), max_digits=9, decimal_places=2)
     observations = models.TextField(verbose_name=_("Observations"), blank=True)
     tenants = models.ManyToManyField(
         Tenant,
