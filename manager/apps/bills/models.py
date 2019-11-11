@@ -181,6 +181,14 @@ class Bill(AbstractBill, TimeStampedModel):
     """
 
     date = models.DateField(verbose_name=_("Date"), default=timezone.now)
+    paid = models.BooleanField(
+        verbose_name=_("Paid"),
+        default=False,
+        help_text=_(
+            "Merely indicative.<br> It doesn't mean the tenants paid it, \
+            it means its transfer statement appeared in the bank."
+        ),
+    )
 
     class Meta:
         verbose_name = _("Bill")
@@ -230,6 +238,7 @@ class TenantValueBill(TimeStampedModel):
         verbose_name = _("Tenant Bill")
         verbose_name_plural = _("Tenant Bills")
         unique_together = ("tenant", "bill")
+        ordering = ("bill", "tenant")
 
     def __str__(self):
         return "%(name)s: %(bill)s (%(date)s)" % {

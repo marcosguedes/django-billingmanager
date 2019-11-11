@@ -13,6 +13,7 @@ django-filer = "*"
 django-extensions = "*"
 python-dateutil = "*"
 django-admin-rangefilter = "*"
+django-admin-shortcuts = "*"
 
 [requires]
 python_version = "3.7"

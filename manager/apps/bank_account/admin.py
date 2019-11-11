@@ -9,6 +9,5 @@ from .models import Deposit, Withdrawal
 @admin.register(Withdrawal)
 class TransferAdmin(admin.ModelAdmin):
     date_hierarchy = "created"
-    list_display = ["__str__", "created"]
-    list_filter = ["created"]
-    list_filter = [("created", DateRangeFilter)]
+    list_display = ["__str__", "created", "tenant"]
+    list_filter = [("created", DateRangeFilter), "tenant"]

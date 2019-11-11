@@ -68,10 +68,10 @@ class RecurrentBillAdmin(admin.ModelAdmin):
 @admin.register(Bill)
 class BillAdmin(admin.ModelAdmin):
     date_hierarchy = "date"
-    list_display = ["__str__", "value", "date"]
-    list_editable = ["date", "value"]
+    list_display = ["__str__", "value", "date", "paid"]
+    list_editable = ["date", "value", "paid"]
     filter_horizontal = ["tenants"]
-    list_filter = ["tenants", ("date", DateRangeFilter), "source"]
+    list_filter = ["tenants", ("date", DateRangeFilter), "paid", "source"]
     actions = ["regenerate_tenant_bill"]
     form = BillForm
     save_as = True
