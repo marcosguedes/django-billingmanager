@@ -37,6 +37,7 @@ SECRET_KEY = env("SECRET_KEY")
 # Application definition
 
 INSTALLED_APPS = [
+    "admin_shortcuts",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -89,6 +90,35 @@ WSGI_APPLICATION = "manager.wsgi.application"
 
 DATABASES = {"default": env.db()}
 
+ADMIN_SHORTCUTS = [
+    # Dummy shortcut. Balance title is hardcoded in the admin
+    {"title": "Balance", "shortcuts": [{"title": "", "url": "/"}]},
+    {
+        "title": "Bills",
+        "shortcuts": [
+            {"title": "Add Bill", "url_name": "admin:bills_bill_add"},
+            {"title": "Change Bills", "url_name": "admin:bills_bill_changelist"},
+        ],
+    },
+    {
+        "shortcuts": [
+            {
+                "title": "Change Tenant Bills",
+                "url_name": "admin:bills_tenantvaluebill_changelist",
+            },
+            {
+                "title": "Change Recurrent Bills",
+                "url_name": "admin:bills_recurrentbill_changelist",
+            },
+        ]
+    },
+]
+
+ADMIN_SHORTCUTS_SETTINGS = {
+    "show_on_all_pages": True,
+    "hide_app_list": True,
+    "open_new_window": False,
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
