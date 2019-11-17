@@ -55,6 +55,7 @@ TEMPLATES = [
             "context_processors": [
                 "django.contrib.auth.context_processors.auth",
                 "django.template.context_processors.debug",
+                "django.template.context_processors.request",
                 "django.template.context_processors.i18n",
                 "django.template.context_processors.media",
                 "django.template.context_processors.static",
@@ -89,6 +90,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "compressor",
     "sekizai",
+    "cachalot",
     "rangefilter",
     "tenants",
     "bank_account",
@@ -125,9 +127,9 @@ ADMIN_SHORTCUTS = [
 ]
 
 ADMIN_SHORTCUTS_SETTINGS = {
-    "show_on_all_pages": True,
+    # "show_on_all_pages": True,
     "hide_app_list": True,
-    "open_new_window": False,
+    # "open_new_window": False,
 }
 
 # Password validation

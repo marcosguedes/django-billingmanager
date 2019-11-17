@@ -18,6 +18,7 @@ django-libsass = "*"
 rcssmin = "*"
 django-compressor = "*"
 django-sekizai = "*"
+django-cachalot = "*"
 
 [requires]
 python_version = "3.7"

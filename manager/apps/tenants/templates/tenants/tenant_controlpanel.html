@@ -1,0 +1,18 @@
+<div class="balance-table">
+    <table>
+    {% for tenant in tenants %}
+        <tr>
+            <td>{{ tenant }}</td>
+            <td>{{ tenant.get_balance|floatformat:"2" }}</td>
+            <td class="commands">
+                <a href="{% url 'admin:bank_account_withdrawal_add' %}?tenant={{tenant.id}}" class="button default">Withdraw</a>
+                <a href="{% url 'admin:bank_account_deposit_add' %}?tenant={{tenant.id}}" class="button default">Deposit</a>
+            </td>
+        </tr>
+    {% endfor %}
+        <tr>
+            <td>Total</td>
+            <td>{{ total_balance|floatformat:"2" }}</td>
+        </tr>
+    </table>
+</div>

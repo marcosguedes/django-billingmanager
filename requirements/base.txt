@@ -17,3 +17,4 @@ django-admin-shortcuts
 django-compressor
 django-libsass
 django-appconf
+django-cachalot

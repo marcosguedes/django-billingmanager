@@ -1,4 +1,5 @@
 from dateutil import rrule
+from django.contrib.admin.models import LogEntry
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.deletion import SET_NULL
@@ -107,9 +108,8 @@ class RecurrentBill(AbstractBill):
 
     def can_generate_bill(self, date=None):
         """
-        Retrieve any bill issued in the selected date if the Recurrent
-        Bill isn't set in the future. If no bill was found, then we can generate
-        a bill.
+        Returns True if there are no related bills issued
+        for the selected year/month, depending on periodicity.
         :param date: use a custom date. Defaults to today
         """
         if not date:
@@ -130,6 +130,20 @@ class RecurrentBill(AbstractBill):
             if self.periodicity == self.PERIODICITY_MONTHLY
             else not bills_generated_on_date_year.exists()
         )
+
+    @classmethod
+    def process_recurrent_bills(cls):
+        """
+        :readme: Checks every recurrent bill to see if it lacks
+        a Bill for this month/year (check periodicity) and generates.
+        one if it does. This method currently runs automatically each time
+        the project starts. It's also ran using a management command.
+        """
+        print(cls.objects.filter(active=True))
+        for recurrent_bill in cls.objects.filter(active=True):
+            if recurrent_bill.can_generate_bill():
+                recurrent_bill.generate_bills()
+                print("Generated bill for {}".format(recurrent_bill))
 
     def generate_bills(self, date_limit=None):
         if not self.can_generate_bill():
