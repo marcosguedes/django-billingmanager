@@ -34,23 +34,6 @@ if env_file.exists():
 
 SECRET_KEY = env("SECRET_KEY")
 
-# Application definition
-
-INSTALLED_APPS = [
-    "admin_shortcuts",
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
-    "django_extensions",
-    "rangefilter",
-    "tenants",
-    "bank_account",
-    "bills",
-]
-
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -82,8 +65,33 @@ TEMPLATES = [
     }
 ]
 
+STATICFILES_FINDERS = (
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    "compressor.finders.CompressorFinder",
+)
+
+
 WSGI_APPLICATION = "manager.wsgi.application"
 
+
+# Application definition
+
+INSTALLED_APPS = [
+    "admin_shortcuts",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django_extensions",
+    "compressor",
+    "rangefilter",
+    "tenants",
+    "bank_account",
+    "bills",
+]
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
@@ -148,7 +156,12 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
-STATICFILES_DIRS = [str(BASE_DIR.parent / "static")]
-MEDIA_ROOT = str(BASE_DIR.parent / "media")
+STATICFILES_DIRS = [("site", str(Path(__file__).resolve().parent.parent / "static"))]
+COMPRESS_PRECOMPILERS = (("text/x-sass", "django_libsass.SassCompiler"),)
+LIBSASS_OUTPUT_STYLE = "compressed"
+LIBSASS_SOURCEMAPS = True
+
+MEDIA_ROOT = str(BASE_DIR.parent.parent / "media")
+STATIC_ROOT = str(BASE_DIR.parent.parent / "static")
 MEDIA_URL = "/media/"
 STATIC_URL = "/static/"

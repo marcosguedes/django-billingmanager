@@ -14,6 +14,9 @@ django-extensions = "*"
 python-dateutil = "*"
 django-admin-rangefilter = "*"
 django-admin-shortcuts = "*"
+django-libsass = "*"
+rcssmin = "*"
+django-compressor = "*"
 
 [requires]
 python_version = "3.7"

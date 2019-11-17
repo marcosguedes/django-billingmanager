@@ -14,3 +14,6 @@ django_extensions
 python-dateutil
 django-admin-rangefilter
 django-admin-shortcuts
+django-compressor
+django-libsass
+django-appconf

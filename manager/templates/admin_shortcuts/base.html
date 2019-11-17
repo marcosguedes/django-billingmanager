@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n static compress %}
 
 {% if enable_admin_shortcuts %}
 
@@ -7,10 +7,23 @@
         {% for group in admin_shortcuts %}
             {% if group.title %}<h2>{{ group.title }}</h2>{% endif %}
             {% if group.title == "Balance" %}
-                <div>
-                    <dt>Tenant 1</dt><dd>0</dd>
-                    <dt>Tenant 1</dt><dd>0</dd>
-                    <dt>Tenant 1</dt><dd>0</dd>
+                <div class="balance-table">
+                    <table>
+                        <tr>
+                            <td>Tenant 1</td>
+                            <td>0</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>Tenant 1</td>
+                            <td>0</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>Tenant 1</td>
+                            <td>0</td>
+                        </tr>
+                    </table>
                 </div>
             {% else %}
 	            <ul>
@@ -28,3 +41,10 @@
     {% endif %}
 
 {% endif %}
+
+
+{% block extra %}
+    {% compress css %}
+	    <link rel="stylesheet" type="text/x-sass" href="{% static "site/sass/balance_styles.sass" %}" />
+	{% endcompress %}
+{% endblock %}
