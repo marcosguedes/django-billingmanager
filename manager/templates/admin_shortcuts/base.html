@@ -12,25 +12,34 @@
                         <tr>
                             <td>Tenant 1</td>
                             <td>0</td>
+                            <td class="commands">
+                                <a href="#" class="button default">Update</a>
+                            </td>
                         </tr>
                         
                         <tr>
                             <td>Tenant 1</td>
                             <td>0</td>
+                            <td class="commands">
+                                <a href="#" class="button default">Update</a>
+                            </td>
                         </tr>
                         
                         <tr>
                             <td>Tenant 1</td>
                             <td>0</td>
+                            <td class="commands">
+                                <a href="#" class="button default">Update</a>
+                            </td>
                         </tr>
                     </table>
                 </div>
             {% else %}
-	            <ul>
-	            {% for shortcut in group.shortcuts %}
-	                <li>{% include 'admin_shortcuts/shortcut.html' %}</li>
-	            {% endfor %}
-	            </ul>
+                <ul>
+                {% for shortcut in group.shortcuts %}
+                    <li>{% include 'admin_shortcuts/shortcut.html' %}</li>
+                {% endfor %}
+                </ul>
             {% endif %}
         {% endfor %}
         </ul>
@@ -45,6 +54,6 @@
 
 {% block extra %}
     {% compress css %}
-	    <link rel="stylesheet" type="text/x-sass" href="{% static "site/sass/balance_styles.sass" %}" />
-	{% endcompress %}
+        <link rel="stylesheet" type="text/x-sass" href="{% static "site/sass/balance_styles.sass" %}" />
+    {% endcompress %}
 {% endblock %}

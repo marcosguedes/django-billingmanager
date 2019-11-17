@@ -17,6 +17,7 @@ django-admin-shortcuts = "*"
 django-libsass = "*"
 rcssmin = "*"
 django-compressor = "*"
+django-sekizai = "*"
 
 [requires]
 python_version = "3.7"

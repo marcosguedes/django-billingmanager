@@ -60,6 +60,7 @@ TEMPLATES = [
                 "django.template.context_processors.static",
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
+                "sekizai.context_processors.sekizai",
             ]
         },
     }
@@ -87,6 +88,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_extensions",
     "compressor",
+    "sekizai",
     "rangefilter",
     "tenants",
     "bank_account",
