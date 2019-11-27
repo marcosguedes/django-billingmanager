@@ -123,7 +123,6 @@ class RecurrentBill(AbstractBill):
         bills_generated_on_date_month = bills_generated_on_date_year.filter(
             date__month=date.month
         )
-
         # README: We only assume there are only two periodicity cases
         return (
             not bills_generated_on_date_month.exists()
@@ -139,7 +138,7 @@ class RecurrentBill(AbstractBill):
         one if it does. This method currently runs automatically each time
         the project starts. It's also ran using a management command.
         """
-        print(cls.objects.filter(active=True))
+
         for recurrent_bill in cls.objects.filter(active=True):
             if recurrent_bill.can_generate_bill():
                 recurrent_bill.generate_bills()
