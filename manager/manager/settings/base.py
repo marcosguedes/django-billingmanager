@@ -61,7 +61,6 @@ TEMPLATES = [
                 "django.template.context_processors.static",
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
-                "sekizai.context_processors.sekizai",
             ]
         },
     }
@@ -70,7 +69,6 @@ TEMPLATES = [
 STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
-    "compressor.finders.CompressorFinder",
 )
 
 
@@ -80,7 +78,6 @@ WSGI_APPLICATION = "manager.wsgi.application"
 # Application definition
 
 INSTALLED_APPS = [
-    "admin_shortcuts",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -88,10 +85,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_extensions",
-    "compressor",
-    "sekizai",
-    "cachalot",
-    "rangefilter",
     "tenants",
     "bank_account",
     "bills",
@@ -101,36 +94,6 @@ INSTALLED_APPS = [
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {"default": env.db()}
-
-ADMIN_SHORTCUTS = [
-    # Dummy shortcut. Balance title is hardcoded in the admin
-    {"title": "Balance", "shortcuts": [{"title": "", "url": "/"}]},
-    {
-        "title": "Bills",
-        "shortcuts": [
-            {"title": "Add Bill", "url_name": "admin:bills_bill_add"},
-            {"title": "Change Bills", "url_name": "admin:bills_bill_changelist"},
-        ],
-    },
-    {
-        "shortcuts": [
-            {
-                "title": "Change Tenant Bills",
-                "url_name": "admin:bills_tenantvaluebill_changelist",
-            },
-            {
-                "title": "Change Recurrent Bills",
-                "url_name": "admin:bills_recurrentbill_changelist",
-            },
-        ]
-    },
-]
-
-ADMIN_SHORTCUTS_SETTINGS = {
-    # "show_on_all_pages": True,
-    "hide_app_list": True,
-    # "open_new_window": False,
-}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -149,8 +112,10 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
 LANGUAGE_CODE = "pt"
-LANGUAGES = (("pt", _("Portuguese")), ("en", _("English")))
-LOCALE_PATHS = (os.path.join(BASE_DIR, "locale/"),)
+LANGUAGES = (("pt", _("Portuguese")),)
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
+# LOCALE_PATHS = (os.path.join(BASE_DIR, "locale/"),)
 
 TIME_ZONE = "Europe/Lisbon"
 TIME_ZONE = "UTC"
@@ -161,9 +126,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 STATICFILES_DIRS = [("site", str(Path(__file__).resolve().parent.parent / "static"))]
-COMPRESS_PRECOMPILERS = (("text/x-sass", "django_libsass.SassCompiler"),)
-LIBSASS_OUTPUT_STYLE = "compressed"
-LIBSASS_SOURCEMAPS = True
 
 MEDIA_ROOT = str(BASE_DIR.parent.parent / "media")
 STATIC_ROOT = str(BASE_DIR.parent.parent / "static")

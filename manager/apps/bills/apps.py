@@ -7,6 +7,7 @@ class BillsConfig(AppConfig):
     def ready(self):
         # Check if there are bills to generate
         # each time the project starts
-        from bills.models import RecurrentBill
+        # from bills.models import RecurrentBill
 
-        RecurrentBill.process_recurrent_bills()
+        # RecurrentBill.process_recurrent_bills()
+        pass

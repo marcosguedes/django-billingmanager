@@ -1,7 +1,6 @@
 from django.contrib import admin
 
 # from django.utils.translation import gettext_lazy as _
-from rangefilter.filter import DateRangeFilter
 from .models import Deposit, Withdrawal
 
 
@@ -10,4 +9,4 @@ from .models import Deposit, Withdrawal
 class TransferAdmin(admin.ModelAdmin):
     date_hierarchy = "created"
     list_display = ["__str__", "created", "tenant"]
-    list_filter = [("created", DateRangeFilter), "tenant"]
+    list_filter = ["created", "tenant"]

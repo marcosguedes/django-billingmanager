@@ -1,4 +1,3 @@
-from dateutil import rrule
 from django.contrib.admin.models import LogEntry
 from django.core.exceptions import ValidationError
 from django.db import models
