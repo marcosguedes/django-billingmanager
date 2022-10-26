@@ -1,7 +1,11 @@
-# django-billingmanager
+# Give Up GitHub
 
-Project that helps me manage my recurrent and one-time bills.
+This project has given up GitHub.  ([See Software Freedom Conservancy's *Give Up  GitHub* site for details](https://GiveUpGitHub.org).)
 
-It's currently designed to run without webservers due to budget constraints. Its initial purpose is to be ran locally using runserver and a simple sqlite database shared via dropbox so there'll be a several scripts that'll be ran on runtime.
+You can now find this project at [Codeberg](https://codeberg.org/marcos.guedes/django-billingmanager) instead.
 
-Spec might change in the future if I decide to buy a VPS or a good home server (my current home server is a refurbished old and noisy Pentium 4 PC with motherboard issues)
+Any use of this project's code by GitHub Copilot, past or present, is done without my permission.  I do not consent to GitHub's use of this project's code in Copilot.
+
+Join me; you can [give up GitHub](https://GiveUpGitHub.org) too!
+
+![Logo of the GiveUpGitHub campaign](https://sfconservancy.org/img/GiveUpGitHub.png)
